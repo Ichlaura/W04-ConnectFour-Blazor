@@ -85,3 +85,4 @@ C:\Users\sohei\Documents\pao\BYU\gameBlazor\W04ConnectFour\obj\Debug\net10.0\W04
 C:\Users\sohei\Documents\pao\BYU\gameBlazor\W04ConnectFour\obj\Debug\net10.0\ref\W04ConnectFour.dll
 C:\Users\sohei\Documents\pao\BYU\gameBlazor\W04ConnectFour\obj\Debug\net10.0\compressed\hr1toi0k6y-{0}-t1o1qhba8b-t1o1qhba8b.gz
 C:\Users\sohei\Documents\pao\BYU\gameBlazor\W04ConnectFour\obj\Debug\net10.0\compressed\dlq1skkh1l-{0}-t1o1qhba8b-t1o1qhba8b.gz
+C:\Users\sohei\Documents\pao\BYU\gameBlazor\W04ConnectFour\obj\Debug\net10.0\W04ConnectFour.sourcelink.json
