@@ -29,3 +29,7 @@ The application is based on concepts from Microsoft Learn and demonstrates inter
 
 ```bash
 dotnet run
+
+📚 References
+Microsoft Learn Module:
+https://learn.microsoft.com/en-us/training/modules/dotnet-connect-four/
