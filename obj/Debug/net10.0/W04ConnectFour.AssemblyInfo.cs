@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("W04ConnectFour")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f5fa1fd10d98e9dd67a08b0e16d1304691f66f0a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+644b7267cb69167d948e31d1517121bcab2e3bef")]
 [assembly: System.Reflection.AssemblyProductAttribute("W04ConnectFour")]
 [assembly: System.Reflection.AssemblyTitleAttribute("W04ConnectFour")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
