@@ -1,0 +1,268 @@
+@page "/connectfour"
+@rendermode InteractiveServer
+
+<PageTitle>Connect Four</PageTitle>
+
+<div class="connect4-page">
+    <div class="header-card">
+        <div>
+            <h1>Connect Four</h1>
+            <p class="subtitle">Blazor game with move history and smart column blocking</p>
+        </div>
+
+        <button class="reset-btn" @onclick="ResetGame">New Game</button>
+    </div>
+
+    <div class="main-grid">
+        <section class="status-card">
+            <h3>Game Status</h3>
+
+            <div class="status-badge @StatusClass">
+                @StatusMessage
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+            {
+                <div class="error-box">
+                    @ErrorMessage
+                </div>
+            }
+
+            <div class="legend">
+                <div class="legend-item">
+                    <span class="legend-dot player1"></span>
+                    <span>Player 1</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot player2"></span>
+                    <span>Player 2</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="board-card">
+            <div class="column-labels">
+                @for (int col = 0; col < Columns; col++)
+                {
+                    <div class="column-label">@(col + 1)</div>
+                }
+            </div>
+
+            <div class="drop-row">
+                @for (int col = 0; col < Columns; col++)
+                {
+                    int safeCol = col;
+                    bool isColumnFull = IsColumnFull(safeCol);
+
+                    <button class="drop-btn"
+                            title="Drop piece"
+                            @onclick="() => DropPiece(safeCol)"
+                            disabled="@(GameOver || isColumnFull)">
+                        ↓
+                    </button>
+                }
+            </div>
+
+            <div class="board-shell">
+                @for (int row = 0; row < Rows; row++)
+                {
+                    int safeRow = row;
+
+                    <div class="board-row">
+                        @for (int col = 0; col < Columns; col++)
+                        {
+                            int safeCol = col;
+
+                            <div class="cell">
+                                <div class="piece @GetPieceClass(Board[safeRow, safeCol])"></div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </section>
+
+        <section class="moves-card">
+            <div class="moves-header">
+                <h3>Moves List</h3>
+                <span class="move-count">@Moves.Count move(s)</span>
+            </div>
+
+            @if (Moves.Count == 0)
+            {
+                <p class="empty-text">No moves yet.</p>
+            }
+            else
+            {
+                <ol class="moves-list">
+                    @foreach (var move in Moves)
+                    {
+                        <li>@move</li>
+                    }
+                </ol>
+            }
+        </section>
+    </div>
+</div>
+
+@code {
+    private const int Rows = 6;
+    private const int Columns = 7;
+
+    private int[,] Board = new int[Rows, Columns];
+    private int CurrentPlayer = 1;
+    private bool GameOver = false;
+    private bool IsDraw = false;
+    private string WinnerMessage = string.Empty;
+    private string ErrorMessage = string.Empty;
+
+    private List<string> Moves = new();
+
+    private string StatusMessage =>
+        !string.IsNullOrWhiteSpace(WinnerMessage)
+            ? WinnerMessage
+            : IsDraw
+                ? "It's a draw!"
+                : $"Current turn: Player {CurrentPlayer}";
+
+    private string StatusClass =>
+        !string.IsNullOrWhiteSpace(WinnerMessage)
+            ? "winner"
+            : IsDraw ? "draw" : "turn";
+
+    private void DropPiece(int column)
+    {
+        if (GameOver)
+            return;
+
+        ErrorMessage = string.Empty;
+
+        if (column < 0 || column >= Columns)
+        {
+            ErrorMessage = "Invalid column.";
+            return;
+        }
+
+        if (IsColumnFull(column))
+        {
+            ErrorMessage = $"Column {column + 1} is full.";
+            return;
+        }
+
+        int row = GetAvailableRow(column);
+
+        if (row < 0 || row >= Rows)
+        {
+            ErrorMessage = "That move could not be completed.";
+            return;
+        }
+
+        int player = CurrentPlayer;
+        Board[row, column] = player;
+
+        Moves.Add($"Player {player} → Column {column + 1}");
+
+        if (CheckWinner(row, column, player))
+        {
+            WinnerMessage = $"Player {player} wins!";
+            GameOver = true;
+            return;
+        }
+
+        if (IsBoardFull())
+        {
+            IsDraw = true;
+            GameOver = true;
+            return;
+        }
+
+        CurrentPlayer = CurrentPlayer == 1 ? 2 : 1;
+    }
+
+    private int GetAvailableRow(int column)
+    {
+        if (column < 0 || column >= Columns)
+            return -1;
+
+        for (int row = Rows - 1; row >= 0; row--)
+        {
+            if (Board[row, column] == 0)
+                return row;
+        }
+
+        return -1;
+    }
+
+    private bool IsColumnFull(int column)
+    {
+        if (column < 0 || column >= Columns)
+            return true;
+
+        return Board[0, column] != 0;
+    }
+
+    private bool IsBoardFull()
+    {
+        for (int col = 0; col < Columns; col++)
+        {
+            if (Board[0, col] == 0)
+                return false;
+        }
+
+        return true;
+    }
+
+    private bool CheckWinner(int row, int col, int player)
+    {
+        return CountConnected(row, col, 0, 1, player) >= 4
+            || CountConnected(row, col, 1, 0, player) >= 4
+            || CountConnected(row, col, 1, 1, player) >= 4
+            || CountConnected(row, col, 1, -1, player) >= 4;
+    }
+
+    private int CountConnected(int row, int col, int rowStep, int colStep, int player)
+    {
+        int count = 1;
+        count += CountDirection(row, col, rowStep, colStep, player);
+        count += CountDirection(row, col, -rowStep, -colStep, player);
+        return count;
+    }
+
+    private int CountDirection(int row, int col, int rowStep, int colStep, int player)
+    {
+        int count = 0;
+
+        int r = row + rowStep;
+        int c = col + colStep;
+
+        while (r >= 0 && r < Rows && c >= 0 && c < Columns && Board[r, c] == player)
+        {
+            count++;
+            r += rowStep;
+            c += colStep;
+        }
+
+        return count;
+    }
+
+    private void ResetGame()
+    {
+        Board = new int[Rows, Columns];
+        CurrentPlayer = 1;
+        GameOver = false;
+        IsDraw = false;
+        WinnerMessage = string.Empty;
+        ErrorMessage = string.Empty;
+        Moves.Clear();
+    }
+
+    private string GetPieceClass(int value)
+    {
+        return value switch
+        {
+            1 => "player1",
+            2 => "player2",
+            _ => "empty"
+        };
+    }
+}
